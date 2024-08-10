@@ -2,6 +2,14 @@ from rest_framework import serializers
 from .models import Product,Collection
 from decimal import Decimal
 
+
+class CollectionSerializer(serializers.Serializer):
+    id=serializers.ImageField()
+    title=serializers.CharField(max_length=255)
+
+
+
+
 class ProductSerializer(serializers.Serializer):
     id=serializers.IntegerField()
     title=serializers.CharField(max_length=255)
@@ -10,8 +18,15 @@ class ProductSerializer(serializers.Serializer):
     price=serializers.DecimalField(max_digits=6,decimal_places=2,source='unit_price')
     price_with_tax=serializers.SerializerMethodField(method_name='calculate_tax')
     # 這裡將 Collection class 內的主鍵給取出
-    collection=serializers.PrimaryKeyRelatedField(
-        queryset=Collection.objects.all()
+    # collection=serializers.PrimaryKeyRelatedField(
+    #     queryset=Collection.objects.all()
+    # )
+    # collection=CollectionSerializer()
+    # 將 Collection class 當作 url 顯示在 API 中
+    collection=serializers.HyperlinkedRelatedField(
+        queryset=Collection.objects.all(),
+        view_name='collection-detail'
+
     )
     def calculate_tax(self,product:Product):
         return product.unit_price*Decimal(1.2)

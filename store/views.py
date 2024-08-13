@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 # 使用 Mixins, Generics
 from rest_framework.mixins import ListModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models import Product,Collection
+from .models import Product,Collection,OrderItem
 from .serializers import ProductSerializer,CollectionSerializer
 from django.db.models import Count
 # 使用 Views Set
@@ -20,12 +20,18 @@ class ProductViewSet(ModelViewSet):
     serializer_class=ProductSerializer
     def get_serializer_context(self):
         return {'request':self.request}
-    def delete(self,request,pk):
-        product=get_object_or_404(Product,pk=pk)
-        if product.orderitems.count()>0:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+       
+    def destory(self,request,*args,**kwargs):
+        if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
+            return Response({'error':'Product can not be delete '})
+        return super().destory(request,*args,**kwargs)
+
+    # def delete(self,request,pk):
+    #     product=get_object_or_404(Product,pk=pk)
+    #     if product.orderitems.count()>0:
+    #         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    #     product.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 # 這裡是使用 class views 的樣式，因為使用 Views Set ，所以不需要再使用
 # class ProductList(ListCreateAPIView):

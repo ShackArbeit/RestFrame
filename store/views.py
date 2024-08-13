@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 # 使用 Mixins, Generics
 from rest_framework.mixins import ListModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models import Product,Collection,OrderItem
-from .serializers import ProductSerializer,CollectionSerializer
+from .models import Product,Collection,OrderItem,Review
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
 from django.db.models import Count
 # 使用 Views Set
 from rest_framework.viewsets import ModelViewSet
@@ -53,9 +53,14 @@ class ProductViewSet(ModelViewSet):
 
 class CollectionViewSet(ModelViewSet):
     queryset=Collection.objects.annotate(
-        products_count=Count('products').all()
+        products_count=Count('products')
     )
     serializer_class=CollectionSerializer
+
+class ReivewViewSet(ModelViewSet):
+    queryset=Review.objects.all()
+    serializer=ReviewSerializer
+
 
 
 # 這裡是使用 class views 的樣式，因為使用 Views Set ，所以不需要再使用 

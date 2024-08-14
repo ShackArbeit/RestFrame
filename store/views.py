@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status 
@@ -16,14 +15,21 @@ from rest_framework.viewsets import ModelViewSet
 # 使用 Django Filter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ProductFilter
+# 使用 Search,Ordering
+from rest_framework.filters import SearchFilter,OrderingFilter
+# 使用 Pageination 
+from .pagination import DefaultPagination
 
 
 class ProductViewSet(ModelViewSet):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
-    filter_backends=[DjangoFilterBackend]
+    filter_backends=[DjangoFilterBackend,SearchFilter,OrderingFilter]
     # filterset_fields=['collection_id']
     filterset_class=ProductFilter
+    pagination_class=DefaultPagination
+    search_fields=['title','description']
+    ordering_fields=['unit_price','last_update']
    # 因為有使用 Django-Filter ，所以可以簡化不用以下
     # def get_queryset(self):
     #     queryset=Product.objects.all()

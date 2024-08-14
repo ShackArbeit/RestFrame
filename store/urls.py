@@ -1,13 +1,19 @@
 from django.urls import path
 from . import views
-from rest_framework.routers import SimpleRouter
+
+from rest_framework_nested import routers
 from pprint import pprint
 
 
-router=SimpleRouter()
+router=routers.DefaultRouter()
 router.register('products',views.ProductViewSet)
 router.register('collections',views.CollectionViewSet)
+
+
 pprint(router.urls)
+
+product_router=routers.NestDefaultRouter(router,'products',lookup='product')
+product_router.register('review',views.ReivewViewSet,basename='product-reviews')
 
 
 # urlpatterns = [
@@ -22,4 +28,4 @@ pprint(router.urls)
 #     path('collections/',views.CollectionList.as_view()),
 #     path('collections/<int:pk>/',views.CollectionDetail.as_view(),name='collection-detail')
 # ]
-urlpatterns =router.urls
+urlpatterns =router.urls+product_router.urls

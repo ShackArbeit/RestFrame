@@ -11,10 +11,18 @@ router.register('collections',views.CollectionViewSet)
 router.register('cart',views.CartViewSet)
 
 
+
 pprint(router.urls)
 
 product_router=routers.NestedDefaultRouter(router,'products',lookup='product')
+
+cart_router=routers.NestedDefaultRouter(router,'cart',lookup='cart')
+cart_router.register('items',views.CartItemViewSet,basename='cart-items')
+
+
 product_router.register('review',views.ReivewViewSet,basename='product-reviews')
+
+urlpatterns =router.urls+product_router.urls+cart_router.urls
 
 
 # urlpatterns = [
@@ -29,4 +37,3 @@ product_router.register('review',views.ReivewViewSet,basename='product-reviews')
 #     path('collections/',views.CollectionList.as_view()),
 #     path('collections/<int:pk>/',views.CollectionDetail.as_view(),name='collection-detail')
 # ]
-urlpatterns =router.urls+product_router.urls

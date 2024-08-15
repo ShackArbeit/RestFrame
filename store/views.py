@@ -5,13 +5,13 @@ from rest_framework import status
 # 使用 class views 
 from rest_framework.views import APIView
 # 使用 Mixins, Generics
-from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from .models import Product,Collection,OrderItem,Review
-from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
+from .models import Product,Collection,OrderItem,Review,Cart
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer
 from django.db.models import Count
 # 使用 Views Set
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet,GenericViewSet
 # 使用 Django Filter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ProductFilter
@@ -188,3 +188,7 @@ def collection_detail(request,pk):
             return Response({'error':'Collection can not be deleted'},status=status.HTTP_405_METHOD_NOT_ALLOWED)    
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)    
+    
+class CartViewSet(CreateModelMixin,GenericViewSet):
+    queryset=Cart.objects.prefetch_related('items__product').all()
+    serializer_class=CartSerializer

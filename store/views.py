@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.mixins import CreateModelMixin,RetrieveModelMixin,DestroyModelMixin
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from .models import Product,Collection,OrderItem,Review,Cart,CartItem
-from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer
 from django.db.models import Count
 # 使用 Views Set
 from rest_framework.viewsets import ModelViewSet,GenericViewSet
@@ -197,8 +197,19 @@ class CartViewSet(CreateModelMixin,
     serializer_class=CartSerializer
 
 class CartItemViewSet(ModelViewSet):
+    http_method_names=['get','post','patch','delete']
     
-    serializer_class=CartItemSerializer
+    # serializer_class=CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method=='POST':
+            return AddCartItemSerializer
+        elif self.request.method=='PATCH':
+            return UpdateCartItemSerializer
+        return CartItemSerializer
+    
+    def get_serializer_context(self):
+        return {'card_id':self.kwargs['cart_pk']}
 
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
